@@ -1,0 +1,73 @@
+---
+title: "Building a Model to Predict Values by Using an SVM in R"
+output: html_notebook
+---
+
+**BACKGROUND**
+
+The general manager of a reputed bank wants a tool that can automatically detect whether an ATM transaction is genuine or fraudulent. The bank has historical data containing both fraudlent and genuine transactions. Details such as the average amount withdrawn are stored in the dataset. the manager wants to analyze the data to draw certain conclusions, so that he can predict if the next transaction will be fraudulent or genuine, on the basis of those conclusions. 
+
+
+**Dataset Description**
+
+*Fraud_ind:.* shows whether a transaction is fraudulent or not
+*num_tr_week:.* ccontains the number of transactions performed in the last week.
+*Withdraw_amt_week:.* stores the net withdrawal amount of the last week
+*Age_on_books:.* shows the total time period in months for which the account is maintained with the bank
+*Distance_bank_Atm:.* stores the distance of an ATM from the branch of the bank in kilometres.
+The total number of transactions stored in the dataset is 1952
+
+```{r}
+fraud_data<- read.csv("C:/Users/BELLO FAHEEDAH/Desktop/DASCA_ABDA/Datasets/Datasets/Fraud_Transactions_data.csv")
+head(fraud_data)
+```
+```{r}
+View(fraud_data)
+```
+
+Specifying the predictor (or independent) variables and keeping them in X dataset
+```{r}
+attach(fraud_data)
+```
+
+```{r}
+X<- subset(fraud_data, select= -Fraud_ind)
+head(X)
+```
+Storing the response (or dependent) variable in the Y dataset.
+```{r}
+Y<- fraud_data$Fraud_ind
+head(Y)
+```
+Building the predictive model
+```{r}
+
+library("e1071")
+model<- svm(X,Y, probability= TRUE)
+model
+```
+To test if the model gives an accurate output
+```{r}
+pred<-predict(model, X)
+head(pred)
+```
+
+```{r}
+library("caret")
+
+```
+
+```{r}
+confusionMatrix(Fraud_ind, pred)
+```
+Predicting new values using the trained model
+```{r}
+test_fraud<-read.csv("C:/Users/BELLO FAHEEDAH/Desktop/DASCA_ABDA/Datasets/Datasets/test_fraud.csv")
+test_fraud
+```
+
+```{r}
+t_pred<-predict(model, test_fraud)
+t_pred
+```
+The above output indicates clearly that transaction *4* and *5* are genuine ones as the SVM predicts them to be *0*. The other four transactions are potential frauds, as the SVM predicts them to be 1. However in order to determine if the transactions are a clear case of fraud, the bank needs to scrutinize these accounts and transactions further.
